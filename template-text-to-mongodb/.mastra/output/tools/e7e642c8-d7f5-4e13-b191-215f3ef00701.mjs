@@ -1,0 +1,11 @@
+export { fO as databaseIntrospectionTool } from '../mastra.mjs';
+import 'mongodb';
+import 'stream/web';
+import 'crypto';
+import 'node:url';
+import 'node:path';
+import 'node:module';
+import 'events';
+import '@mastra/mongodb';
+import 'pino';
+import 'pino-pretty';

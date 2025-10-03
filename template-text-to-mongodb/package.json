@@ -1,0 +1,37 @@
+{
+  "name": "template-text-to-mongodb",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "mastra start"
+  },
+  "packageManager": "pnpm@10.18.0",
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "description": "A Mastra template for a system that enables MongoDB database introspection and natural language to MongoDB query conversion.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.3.24",
+    "@mastra/core": "latest",
+    "@mastra/mongodb": "latest",
+    "@mastra/loggers": "latest",
+    "@mastra/memory": "latest",
+    "ai": "^4.3.19",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^17.0.1",
+    "mongodb": "^6.5.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "mastra": "latest",
+    "typescript": "^5.8.3"
+  }
+}

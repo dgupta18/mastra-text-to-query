@@ -1,0 +1,6 @@
+{
+  "/Users/divya.gupta/Documents/mastra-text-to-query/template-text-to-mongodb/.mastra/.build/@mastra-loggers.mjs": {
+    "pino": "/Users/divya.gupta/Documents/mastra-text-to-query/template-text-to-mongodb/node_modules/.pnpm/@mastra+loggers@0.10.15_@mastra+core@0.20.0_openapi-types@12.1.3_react@19.2.0_zod@3.25.76_/node_modules/@mastra/loggers/dist/index.js",
+    "pino-pretty": "/Users/divya.gupta/Documents/mastra-text-to-query/template-text-to-mongodb/node_modules/.pnpm/@mastra+loggers@0.10.15_@mastra+core@0.20.0_openapi-types@12.1.3_react@19.2.0_zod@3.25.76_/node_modules/@mastra/loggers/dist/index.js"
+  }
+}

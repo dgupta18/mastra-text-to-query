@@ -2,26 +2,6 @@
 
 A Mastra template to build a system enabling MongoDB database introspection and natural language to MongoDB query conversion. In this template, you'll be able to ask questions about a dataset in natural language and receive answers in natural language. Behind the scenes, the system will convert the natural language query to a MongoDB query using AI-powered database introspection and translation.
 
-## Architecture
-
-### Core Components
-
-1. **MongoDB Agent** (`src/mastra/agents/mongodb-agent.ts`)
-   - AI agent that orchestrates the entire workflow
-   - Handles natural language processing and query generation
-   - Provides intelligent responses and explanations
-
-2. **Tools** (`src/mastra/tools/`)
-   - `database-introspection-tool.ts`: Analyzes MongoDB database structure
-   - `database-seeding-tool.ts`: Seeds databases with sample collections and documents
-   - `mongodb-execution-tool.ts`: Safely executes MongoDB queries
-   - `mongodb-generation-tool.ts`: Converts natural language to MongoDB queries
-
-3. **Workflow** (`src/mastra/workflows/database-query-workflow.ts`)
-   - Orchestrates the complete process from connection to results
-   - Handles user interactions and data flow
-   - Manages error states and recovery
-
 ## Getting Started
 
 ### Prerequisites
@@ -61,6 +41,20 @@ pnpm dev
 pnpm build
 pnpm start
 ```
+
+## Architecture
+
+### Core Components
+
+- **MongoDB Agent** (`src/mastra/agents/mongodb-agent.ts`): AI agent that orchestrates the natural language processing and MongoDB query generation
+
+- **Tools** (`src/mastra/tools/`)
+   - `database-introspection-tool.ts`: Analyzes MongoDB database structure
+   - `database-seeding-tool.ts`: Seeds databases with sample collections and documents
+   - `mongodb-execution-tool.ts`: Executes MongoDB queries
+   - `mongodb-generation-tool.ts`: Converts natural language to MongoDB queries
+
+- **Workflow** (`src/mastra/workflows/database-query-workflow.ts`): Handles user interactions and data flow
 
 ### Example Interactions
 

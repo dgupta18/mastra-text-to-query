@@ -1,6 +1,6 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, Db, ObjectId } from 'mongodb';
 
 const createDatabaseConnection = async (connectionString: string): Promise<{ client: MongoClient; db: Db }> => {
   const client = new MongoClient(connectionString, {
@@ -109,11 +109,11 @@ async function seedEcommerceData(db: Db, dropExisting: boolean, recordCount: num
 
   // Categories
   const categories = [
-    { _id: 'electronics', name: 'Electronics', description: 'Electronic devices and gadgets' },
-    { _id: 'clothing', name: 'Clothing', description: 'Fashion and apparel' },
-    { _id: 'books', name: 'Books', description: 'Books and literature' },
-    { _id: 'home', name: 'Home & Garden', description: 'Home improvement and garden supplies' },
-    { _id: 'sports', name: 'Sports', description: 'Sports and outdoor equipment' },
+    { _id: new ObjectId(), name: 'Electronics', description: 'Electronic devices and gadgets', slug: 'electronics' },
+    { _id: new ObjectId(), name: 'Clothing', description: 'Fashion and apparel', slug: 'clothing' },
+    { _id: new ObjectId(), name: 'Books', description: 'Books and literature', slug: 'books' },
+    { _id: new ObjectId(), name: 'Home & Garden', description: 'Home improvement and garden supplies', slug: 'home' },
+    { _id: new ObjectId(), name: 'Sports', description: 'Sports and outdoor equipment', slug: 'sports' },
   ];
 
   const categoryResult = await db.collection('categories').insertMany(categories);
@@ -127,10 +127,10 @@ async function seedEcommerceData(db: Db, dropExisting: boolean, recordCount: num
   ];
 
   for (let i = 0; i < Math.min(recordCount, 200); i++) {
-    const categoryIds = categories.map(c => c._id);
+    const categorySlugs = categories.map(c => c.slug);
     const product = {
       name: `${productNames[i % productNames.length]} ${i + 1}`,
-      category: categoryIds[i % categoryIds.length],
+      category: categorySlugs[i % categorySlugs.length],
       price: Math.round((Math.random() * 500 + 10) * 100) / 100,
       description: `High-quality ${productNames[i % productNames.length].toLowerCase()} with excellent features`,
       inStock: Math.floor(Math.random() * 100),
@@ -165,7 +165,7 @@ async function seedEcommerceData(db: Db, dropExisting: boolean, recordCount: num
       preferences: {
         newsletter: Math.random() > 0.3,
         notifications: Math.random() > 0.5,
-        favoriteCategories: [categories[i % categories.length]._id, categories[(i + 1) % categories.length]._id],
+        favoriteCategories: [categories[i % categories.length].slug, categories[(i + 1) % categories.length].slug],
       },
     };
     customers.push(customer);

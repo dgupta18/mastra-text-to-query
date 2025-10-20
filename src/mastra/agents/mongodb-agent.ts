@@ -10,7 +10,7 @@ import { mongodbGenerationTool } from '../tools/mongodb-generation-tool';
 // Initialize memory with MongoDBStore for persistence
 const memory = new Memory({
   storage: new MongoDBStore({
-    url: process.env.MONGODB_URL || 'mongodb+srv://user:pass@<cluster>.mongodb.net',
+    url: process.env.MONGODB_URI || 'mongodb+srv://user:pass@<cluster>.mongodb.net',
     dbName: process.env.MONGODB_DB_NAME || 'mastra-text-to-query',
   }),
 });
@@ -218,7 +218,7 @@ export const mongodbAgent = new Agent({
     - **Next Steps**: Suggest related queries or analysis that might be helpful
 
     Always prioritize user safety, data security, clear communication, and meaningful insights throughout the interaction.`,
-  model: openai('gpt-4o-mini'),
+  model: openai('gpt-5-nano'),
   tools: {
     databaseIntrospectionTool,
     databaseSeedingTool,

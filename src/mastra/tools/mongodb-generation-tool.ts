@@ -5,19 +5,15 @@ import { generateObject } from 'ai';
 
 // Define the schema for MongoDB query generation output
 const mongodbGenerationSchema = z.object({
-  operation: z.object({
-    type: z.enum(['find', 'aggregate', 'count', 'distinct']).describe('Type of MongoDB operation'),
-    collection: z.string().describe('Collection name to query'),
-    query: z.any().optional().describe('MongoDB query object for find operations'),
-    pipeline: z.array(z.any()).optional().describe('Aggregation pipeline for aggregate operations'),
-    field: z.string().optional().describe('Field name for distinct operations'),
-    options: z.object({
-      limit: z.number().optional(),
-      skip: z.number().optional(),
-      sort: z.any().optional(),
-      projection: z.any().optional(),
-    }).optional(),
-  }),
+  type: z.enum(['find', 'aggregate', 'count', 'distinct']).describe('Type of MongoDB operation'),
+  collection: z.string().describe('Collection name to query'),
+  query: z.string().optional().describe('MongoDB query as JSON string for find operations'),
+  pipeline: z.string().optional().describe('Aggregation pipeline as JSON string for aggregate operations'),
+  field: z.string().optional().describe('Field name for distinct operations'),
+  limit: z.number().optional().describe('Limit number of results'),
+  skip: z.number().optional().describe('Skip number of documents'),
+  sort: z.string().optional().describe('Sort object as JSON string'),
+  projection: z.string().optional().describe('Projection object as JSON string'),
   explanation: z.string().describe('Explanation of what the query does'),
   confidence: z.number().min(0).max(1).describe('Confidence level in the generated query (0-1)'),
   assumptions: z.array(z.string()).describe('Any assumptions made while generating the query'),
@@ -56,7 +52,7 @@ export const mongodbGenerationTool = createTool({
           unique: z.boolean().optional(),
           sparse: z.boolean().optional(),
           background: z.boolean().optional(),
-          expireAfterSeconds: z.number().optional(),
+          expireAfterSeconds: z.number().nullable().optional(),
         })),
       })),
       stats: z.array(z.object({
@@ -109,6 +105,12 @@ MONGODB QUERY RULES:
 7. Use aggregation for complex operations like grouping, counting, averaging
 8. Consider index usage for performance
 
+OUTPUT FORMAT:
+- For 'query' field: Provide the MongoDB query object as a JSON string
+- For 'pipeline' field: Provide the aggregation pipeline array as a JSON string  
+- For 'sort' and 'projection' options: Provide as JSON strings
+- Example: query: '{"price": {"$gte": 100}}' not query: {"price": {"$gte": 100}}
+
 AGGREGATION PIPELINE STAGES:
 - $match: Filter documents (like WHERE in SQL)
 - $group: Group documents and perform aggregations
@@ -136,12 +138,14 @@ Analyze the user's question carefully and generate the most appropriate MongoDB 
       const userPrompt = `Generate a MongoDB operation for this question: "${naturalLanguageQuery}"
 
 Please provide:
-1. The complete MongoDB operation object
+1. The complete MongoDB operation object (with query, pipeline, sort, projection as JSON strings)
 2. A clear explanation of what the operation does
 3. Your confidence level (0-1)
 4. Any assumptions you made
 5. List of collections used
-6. Query complexity level`;
+6. Query complexity level
+
+REMEMBER: Return complex objects like query, pipeline, sort, and projection as JSON strings, not objects.`;
 
       const result = await generateObject({
         model: openai('gpt-4o'),
@@ -153,7 +157,29 @@ Please provide:
         temperature: 0.1, // Low temperature for more deterministic results
       });
 
-      return result.object;
+      // Parse JSON strings back into objects and restructure for consuming code
+      const parsedResult = {
+        operation: {
+          type: result.object.type,
+          collection: result.object.collection,
+          query: result.object.query ? JSON.parse(result.object.query) : undefined,
+          pipeline: result.object.pipeline ? JSON.parse(result.object.pipeline) : undefined,
+          field: result.object.field,
+          options: {
+            limit: result.object.limit,
+            skip: result.object.skip,
+            sort: result.object.sort ? JSON.parse(result.object.sort) : undefined,
+            projection: result.object.projection ? JSON.parse(result.object.projection) : undefined,
+          },
+        },
+        explanation: result.object.explanation,
+        confidence: result.object.confidence,
+        assumptions: result.object.assumptions,
+        collections_used: result.object.collections_used,
+        queryComplexity: result.object.queryComplexity,
+      };
+
+      return parsedResult;
     } catch (error) {
       throw new Error(`Failed to generate MongoDB query: ${error instanceof Error ? error.message : String(error)}`);
     }

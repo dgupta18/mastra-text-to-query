@@ -397,6 +397,7 @@ const reviewAndExecuteStep = createStep({
     }
 
     const { approved, modifiedOperation } = resumeData;
+
     const finalOperation = modifiedOperation || generatedOperation.operation;
 
     if (!approved) {
@@ -414,14 +415,33 @@ const reviewAndExecuteStep = createStep({
         throw new Error('MongoDB execution tool is not available');
       }
 
+      // Build an explicit operation object for the tool to avoid passing explicit nulls
+      const opForTool: any = {
+        type: finalOperation.type,
+        collection: finalOperation.collection,
+      };
+
+      if (finalOperation.pipeline) opForTool.pipeline = finalOperation.pipeline;
+      if (finalOperation.query) opForTool.query = finalOperation.query;
+      if (finalOperation.field) opForTool.field = finalOperation.field;
+
+      // Normalize options with sensible defaults
+      const opts = finalOperation.options || {};
+      opForTool.options = {
+        limit: typeof opts.limit === 'number' ? opts.limit : 100,
+        skip: typeof opts.skip === 'number' ? opts.skip : 0,
+      } as any;
+
+      if (opts.sort) opForTool.options.sort = opts.sort;
+      if (opts.projection) opForTool.options.projection = opts.projection;
+
+      console.log('opForTool:', opForTool);
+
       const result = await mongodbExecutionTool.execute({
         context: {
           connectionString,
           dbName,
-          operation: {
-            ...finalOperation,
-            options: finalOperation.options || { limit: 100, skip: 0 }
-          },
+          operation: opForTool,
         },
         runtimeContext: runtimeContext || new RuntimeContext(),
       });
@@ -432,6 +452,9 @@ const reviewAndExecuteStep = createStep({
       }
 
       const executionResult = result as any;
+      if (executionResult.error) {
+        throw new Error("Error during execution: " + executionResult.message);
+      }
 
       return {
         success: executionResult.success || false,

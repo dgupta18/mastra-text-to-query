@@ -1,6 +1,6 @@
 # Template Text-to-MongoDB
 
-A Mastra template to build a system enabling MongoDB database introspection and natural language to MongoDB query conversion. In this template, you'll be able to ask questions about a dataset in natural language and receive answers in natural language. Behind the scenes, the system will convert the natural language query to a MongoDB query using AI-powered database introspection and translation.
+A Mastra template to build a system enabling MongoDB database introspection and natural language to MongoDB query conversion. In this template, you'll be able to ask questions about a dataset in natural language and receive an executable MongoDB query. Behind the scenes, the system will convert the natural language query to a MongoDB query using AI-powered database introspection and translation.
 
 ## Getting Started
 
@@ -27,6 +27,7 @@ A Mastra template to build a system enabling MongoDB database introspection and 
    ```
    OPENAI_API_KEY=your_openai_api_key
    MONGODB_URI=your_mongodb_connection_string
+   MONGODB_DB_NAME=your_db_name
    ```
 
 ### Usage
@@ -74,16 +75,6 @@ pnpm start
    - Find operations for simple document retrieval
    - Proper indexing recommendations
    - Query optimization suggestions
-
-## Configuration
-
-### Environment Variables
-
-- `OPENAI_API_KEY`: Your OpenAI API key for AI-powered query generation
-- `MONGODB_URI`: Default MongoDB connection string
-- `LOG_LEVEL`: Logging level (optional; default: 'info')
-
-## Development
 
 ### Project Structure
 

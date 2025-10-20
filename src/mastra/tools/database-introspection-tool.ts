@@ -33,15 +33,16 @@ export const databaseIntrospectionTool = createTool({
       client = mongoClient;
       console.log('✅ Connected to MongoDB for introspection');
 
-      // Get all collections
+      // Get all collections (limit to prevent BSON size issues)
       const collections = await db.listCollections().toArray();
+      const limitedCollections = collections.slice(0, 10); // Limit to first 10 collections
       
       const collectionDetails = [];
       const documentSchemas = [];
       const indexDetails = [];
       const collectionStats = [];
 
-      for (const collectionInfo of collections) {
+      for (const collectionInfo of limitedCollections) {
         const collectionName = collectionInfo.name;
         const collection = db.collection(collectionName);
 
@@ -71,8 +72,8 @@ export const databaseIntrospectionTool = createTool({
             })),
           });
 
-          // Sample documents to infer schema
-          const sampleSize = Math.min(100, stats.count || 0);
+          // Sample documents to infer schema (reduced size to prevent BSON limit)
+          const sampleSize = Math.min(10, stats.count || 0); // Reduced from 100 to 10
           const sampleDocuments = await collection.aggregate([
             { $sample: { size: sampleSize } }
           ]).toArray();
@@ -117,7 +118,9 @@ export const databaseIntrospectionTool = createTool({
         indexes: indexDetails,
         stats: collectionStats,
         summary: {
-          totalCollections: collections.length,
+          totalCollections: limitedCollections.length, // Use limited count
+          collectionsAnalyzed: limitedCollections.length,
+          collectionsSkipped: Math.max(0, collections.length - limitedCollections.length),
           totalDocuments: collectionStats.reduce((sum, stat) => sum + stat.documentCount, 0),
           totalIndexes: indexDetails.reduce((sum, detail) => sum + detail.indexes.length, 0),
           avgDocumentsPerCollection: collectionStats.length > 0 
@@ -149,11 +152,14 @@ function analyzeDocumentFields(documents: any[]): any {
     analyzeObject(doc, fieldStats, '');
   });
 
-  // Calculate statistics for each field
+  // Calculate statistics for each field (limit fields to prevent BSON size issues)
   const totalDocs = documents.length;
   const result: { [key: string]: any } = {};
+  
+  // Limit the number of fields analyzed per collection
+  const fieldPaths = Object.keys(fieldStats).slice(0, 100); // Limit to 20 fields per collection
 
-  Object.keys(fieldStats).forEach(fieldPath => {
+  fieldPaths.forEach(fieldPath => {
     const stats = fieldStats[fieldPath];
     const types = Object.keys(stats.types);
     const mostCommonType = types.reduce((a, b) => 
@@ -162,7 +168,7 @@ function analyzeDocumentFields(documents: any[]): any {
 
     result[fieldPath] = {
       type: mostCommonType,
-      alternativeTypes: types.filter(t => t !== mostCommonType),
+      alternativeTypes: types.filter(t => t !== mostCommonType).slice(0, 2), // Limit alt types
       presence: (stats.count / totalDocs * 100).toFixed(1) + '%',
       count: stats.count,
       samples: stats.samples.slice(0, 3), // First 3 sample values
@@ -207,7 +213,15 @@ function analyzeObject(obj: any, fieldStats: any, prefix: string) {
     // Track sample values (limit to prevent memory issues)
     if (field.samples.length < 10 && !field.samples.includes(value)) {
       if (valueType !== 'object' && valueType !== 'array') {
-        field.samples.push(value);
+        // Truncate long strings to prevent BSON limit
+        if (typeof value === 'string' && value.length > 50) {
+          field.samples.push(value.substring(0, 50) + '...');
+        } else if (typeof value === 'number' || typeof value === 'boolean' || value === null) {
+          field.samples.push(value);
+        } else {
+          // For other types, store a simplified representation
+          field.samples.push(String(value).substring(0, 30) + '...');
+        }
       }
     }
 

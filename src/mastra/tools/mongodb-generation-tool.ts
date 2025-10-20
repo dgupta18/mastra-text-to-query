@@ -1,3 +1,18 @@
+/**
+ * mongodb-generation-tool.ts
+ * -------------------------
+ * Purpose: Convert a natural language query plus a database schema into a
+ * structured MongoDB operation. The tool returns an object containing an
+ * `operation` (type, collection, query|pipeline|field, options) as well as
+ * `explanation`, `confidence`, `assumptions`, and `collections_used`.
+ *
+ * Important notes / pitfalls:
+ * - The tool returns `query` and `pipeline` as JSON strings; callers must
+ *   JSON.parse them into objects/arrays before passing to the execution tool.
+ * - Avoid passing explicit `null` values for numeric options (limit/skip)
+ *   or for `field`. Prefer numbers or omit the property so downstream
+ *   validation can apply defaults.
+ */
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { openai } from '@ai-sdk/openai';

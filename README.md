@@ -57,6 +57,21 @@ pnpm start
 
 - **Workflow** (`src/mastra/workflows/database-query-workflow.ts`): Handles user interactions and data flow
 
+## MongoDB usage & troubleshooting (quick)
+
+If you run into validation errors when executing generated MongoDB operations (for example, the execution step reports that "operation.options.limit: Expected number, received null"), here are a few quick checks:
+
+- Ensure the generated operation does not contain explicit `null` values for `limit`, `skip`, or `field`. The runtime expects numbers or undefined, not `null`.
+- For `aggregate` operations, make sure `pipeline` is an actual array of stage objects (not a JSON string or a single string). Example:
+
+   Correct: `{ type: "aggregate", collection: "products", pipeline: [ { "$group": { "_id": null, "avg": { "$avg": "$price" } } } ] }`
+
+   Incorrect: `{ type: "aggregate", collection: "products", pipeline: "[{ \"$group\": { ... }}]" }`
+
+- When reviewing operations in the review step you can modify the operation before approving it; common edits include removing `null` and setting `options.limit` to a number (e.g. 100) or ensuring `pipeline` is an array.
+
+Try-it: to reproduce the review+execute flow locally, run the dev server and exercise the workflow through the Mastra UI or invoke the workflow runner script included in the project.
+
 ### Example Interactions
 
 1. **Connect to Database**:

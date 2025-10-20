@@ -325,6 +325,12 @@ const generateMongoDBStep = createStep({
 });
 
 // Step 5: Review operation and execute query
+//
+// Note: This step builds an explicit sanitized `opForTool` object before
+// calling the execution tool. The sanitizer removes explicit nulls and
+// provides sensible defaults for numeric options (limit, skip). Keep this
+// behavior if modifying the step: it prevents common validation errors where
+// the execution tool rejects `null` values for fields that should be numbers.
 const reviewAndExecuteStep = createStep({
   id: 'review-and-execute',
   inputSchema: z.object({

@@ -1,3 +1,19 @@
+/**
+ * database-seeding-tool.ts
+ * ------------------------
+ * Purpose: Seed a MongoDB database with small, example datasets used for
+ * development and demo workflows. Supports seed types like 'ecommerce',
+ * 'social', and 'financial'.
+ *
+ * Input (high-level): connectionString, dbName (optional), seedType, dropExisting, recordCount
+ * Output: success boolean, message, collectionsCreated, recordCount, details
+ *
+ * Important notes / pitfalls:
+ * - This tool inserts sample documents and may drop existing collections
+ *   when `dropExisting` is true. Use carefully on real databases.
+ * - The `recordCount` controls a capped number of generated documents and
+ *   is clamped internally to avoid huge inserts during local testing.
+ */
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { MongoClient, Db, ObjectId } from 'mongodb';

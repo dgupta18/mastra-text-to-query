@@ -1,3 +1,26 @@
+/**
+ * database-introspection-tool.ts
+ * ------------------------------
+ * Purpose: Connect to a MongoDB database and produce a lightweight
+ * structural summary useful for prompt-based generation and UI display.
+ *
+ * Output shape (high level):
+ * - database: { name, collections, dataSize, storageSize, indexSize }
+ * - collections: array of { name, type, options, error? }
+ * - schemas: array of { collectionName, sampleSize, fields }
+ * - indexes: array of { collectionName, indexes: [...] }
+ * - stats: array of per-collection stats
+ * - summary: { totalCollections, collectionsAnalyzed, collectionsSkipped, totalDocuments, totalIndexes, avgDocumentsPerCollection }
+ *
+ * Important notes / pitfalls:
+ * - This tool samples up to 10 documents per collection (configurable).
+ *   The sampling is intentionally small to avoid BSON size and memory issues
+ *   in demo environments. As a result, field presence/presence percentages are
+ *   approximations based on the sample.
+ * - The tool limits the number of collections inspected to the first 10 to
+ *   keep the output concise for AI prompts; consider increasing this in
+ *   production if you need broader analysis.
+ */
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { MongoClient, Db } from 'mongodb';

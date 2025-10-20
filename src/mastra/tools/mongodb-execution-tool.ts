@@ -1,3 +1,25 @@
+/**
+ * mongodb-execution-tool.ts
+ * -------------------------
+ * Purpose: Execute read-only MongoDB operations (find, aggregate, count, distinct).
+ * Input expectations (tool inputSchema):
+ * - connectionString: string
+ * - dbName: optional string (falls back to DEFAULT_DB_NAME)
+ * - operation: object with:
+ *    - type: 'find'|'aggregate'|'count'|'distinct'
+ *    - collection: string
+ *    - query: optional object (for find/count)
+ *    - pipeline: optional array (for aggregate)
+ *    - field: optional string (for distinct)
+ *    - options: optional object with numeric `limit` and `skip` (numbers, not null)
+ *
+ * Common pitfalls:
+ * - Make sure `pipeline` is an array of stage objects. If missing, the tool
+ *   will add a default $limit stage (100) when executing aggregates.
+ * - Avoid explicit `null` values in `operation.options`; the validation
+ *   schema expects numbers or absent fields so prefer to omit or set numeric
+ *   defaults before invoking the tool.
+ */
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { MongoClient, Db } from 'mongodb';

@@ -218,7 +218,7 @@ export const mongodbAgent = new Agent({
     - **Next Steps**: Suggest related queries or analysis that might be helpful
 
     Always prioritize user safety, data security, clear communication, and meaningful insights throughout the interaction.`,
-  model: openai('gpt-5-nano'),
+  model: openai('gpt-4o'),
   tools: {
     databaseIntrospectionTool,
     databaseSeedingTool,

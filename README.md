@@ -43,6 +43,10 @@ pnpm build
 pnpm start
 ```
 
+#### Testing the workflow
+
+Run the app in development mode. In your browser, navigate to the Playground (usually at `http://localhost:4111/`). Go to the `Workflows` tab and click `database-query-workflow`. Here, you can view each step of the workflow.
+
 ## Architecture
 
 ### Core Components
@@ -70,7 +74,7 @@ If you run into validation errors when executing generated MongoDB operations (f
 
 - When reviewing operations in the review step you can modify the operation before approving it; common edits include removing `null` and setting `options.limit` to a number (e.g. 100) or ensuring `pipeline` is an array.
 
-Try-it: to reproduce the review+execute flow locally, run the dev server and exercise the workflow through the Mastra UI or invoke the workflow runner script included in the project.
+Try-it: to reproduce the review+execute flow locally, run the dev server and exercise the workflow through the Mastra UI.
 
 ### Example Interactions
 

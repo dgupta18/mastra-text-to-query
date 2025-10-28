@@ -48,7 +48,7 @@ export const mongodbExecutionTool = createTool({
       type: z.enum(['find', 'aggregate', 'count', 'distinct']).describe('Type of MongoDB operation'),
       collection: z.string().describe('Collection name to query'),
       query: z.any().optional().describe('MongoDB query object for find operations'),
-      pipeline: z.array(z.any()).optional().describe('Aggregation pipeline for aggregate operations'),
+      pipeline: z.array(z.record(z.string(), z.any())).optional().describe('Aggregation pipeline for aggregate operations'),
       field: z.string().optional().describe('Field name for distinct operations'),
       options: z.object({
         limit: z.number().optional().default(100),

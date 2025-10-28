@@ -21,6 +21,8 @@ export const mongodbAgent = new Agent({
 
     ## CAPABILITIES
 
+    When you are given tools to use, you must use them following the guidelines for each tool.
+
     ### 1. Database Connection & Introspection
     - Connect to any MongoDB database using connection strings
     - Analyze database schemas including collections, document structures, indexes, and relationships

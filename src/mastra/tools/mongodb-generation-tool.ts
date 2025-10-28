@@ -50,14 +50,14 @@ export const mongodbGenerationTool = createTool({
       }),
       collections: z.array(z.object({
         name: z.string(),
-        type: z.string(),
+        type: z.string().optional(),
         options: z.any().optional(),
         error: z.string().optional(),
       })),
       schemas: z.array(z.object({
         collectionName: z.string(),
-        sampleSize: z.number(),
-        fields: z.record(z.any()),
+        sampleSize: z.number().optional(),
+        fields: z.record(z.any()).optional().default({}),
       })),
       indexes: z.array(z.object({
         collectionName: z.string(),
@@ -69,7 +69,7 @@ export const mongodbGenerationTool = createTool({
           background: z.boolean().optional(),
           expireAfterSeconds: z.number().nullable().optional(),
         })),
-      })),
+      })).optional().default([]),
       stats: z.array(z.object({
         name: z.string(),
         documentCount: z.number(),
@@ -77,7 +77,7 @@ export const mongodbGenerationTool = createTool({
         storageSize: z.number(),
         totalIndexSize: z.number(),
         indexCount: z.number(),
-      })),
+      })).optional().default([]),
     }),
   }),
   description: 'Generates MongoDB queries from natural language descriptions using database schema information',
